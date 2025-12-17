@@ -1,73 +1,128 @@
-# Welcome to your Lovable project
+🛡️ ResQify — Personal Safety App
 
-## Project info
+A mobile-first personal safety application built to provide real-time protection, trusted contacts, and intelligent emergency response, especially for women and minors.
+ResQify focuses on clarity, reliability, and instant action — not just UI visuals.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+🌟 Core Highlights
+Feature	Description
+📱 Mobile-First	Designed strictly for mobile devices
+🎨 Aura UI	Subtle character-based light aura background on all screens
+🚨 SOS Ready	One-tap emergency actions
+🗺️ Live Maps	Real-time location with filters
+🔐 Permission Control	Smart activation only when needed
+👩‍👧 Minor Protection	Locked safety rules for minors
+🎨 Global UI Rules
+Rule	Behavior
+Aura Background	Very light aura rays on every page
+Theme Based	Aura color changes with selected character
+Touch Safe	Background never blocks clicks
+Scroll Safe	All pages are fully scrollable
+Button Safety	No hidden Continue / Save / Submit buttons
 
-## How can I edit this code?
+✅ All action buttons are always visible and clickable.
 
-There are several ways of editing your application.
+🗺️ Maps & Navigation
 
-**Use Lovable**
+Powered by Google Maps API using:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+@vis.gl/react-google-maps
 
-Changes made via Lovable will be committed automatically to this repo.
+🔍 Map Filters (Fully Functional)
+Filter	Behavior
+🚓 Police	Nearby police stations
+🏥 Hospitals	Nearby hospitals
+🛟 Safe Zones	User-defined safe places
+👥 Best Friends	Live moving friend locations
+📍 Marker Interaction
 
-**Use your preferred IDE**
+When a marker is tapped:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Info Shown	Actions
+Place Name	📞 Call
+Type	🧭 Navigate
+Distance	—
+👥 Best Friend Mode (Critical Feature)
+State	Behavior
+🔴 OFF	Permissions inactive
+🟢 ON	All permissions enabled
+📍 Live Tracking	Continuous live location
+🧭 Map	Moving friend icon visible
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Only one toggle controls everything.
 
-Follow these steps:
+🔐 Permissions System
+Permission	Default	Activated When
+🔔 Notification	OFF	SOS / Best Friend Mode
+📞 Call	OFF	SOS / Best Friend Mode
+📍 Location	OFF	SOS / Best Friend Mode
+🎤 Audio	OFF	SOS
+🎥 Video	OFF	SOS
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Permissions activate only when required.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+🧒 Minor Safety Rule (STRICT)
 
-# Step 3: Install the necessary dependencies.
-npm i
+If:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+isMinor === true
+AND relationship === "Mother"
+
+
+Then:
+
+Rule	Status
+Best Friend Mode	🟢 ON
+Toggle	🔒 Locked
+Permissions	✅ Enabled
+Live Location	📍 Always ON
+Disable Allowed	❌ Until age ≥ 18
+
+This ensures non-negotiable safety for minors.
+
+⚙️ Settings Page (Clean Architecture)
+Feature	Placement
+Best Friend Mode	Settings (Main)
+Permissions	Settings (Main)
+Auto SOS	Separate
+Safety Check-ins	Separate
+
+❌ No duplicated toggles
+❌ No confusing nested menus
+
+🚨 SOS & Emergency Flow
+Action	Behavior
+SOS Trigger	Enables permissions
+Live Location	Starts instantly
+Trusted Contacts	Notified
+Audio / Video	Activated (if enabled)
+🧱 Tech Stack
+Tech	Purpose
+⚡ Vite	Fast build tool
+⚛️ React + TypeScript	App logic
+🎨 Tailwind CSS	Styling
+🧩 shadcn-ui	UI components
+🗺️ Google Maps API	Location services
+🚀 Running Locally
+npm install
 npm run dev
-```
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Runs with hot reload and mobile-friendly preview.
 
-**Use GitHub Codespaces**
+🌐 Deployment
+Method	Action
+Lovable	Share → Publish
+Custom Domain	Project → Settings → Domains
+🧠 Design Philosophy
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+“Safety should never be hidden behind bad UI.”
 
-## What technologies are used for this project?
+ResQify prioritizes:
 
-This project is built with:
+Visibility
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Reliability
 
-## How can I deploy this project?
+Real-world logic
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Zero UI confusion during emergencies
