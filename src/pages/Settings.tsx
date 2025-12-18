@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { User, Shield, Bell, Clock, LogOut, ChevronRight, AlertTriangle, MapPin, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageWrapper } from '@/components/PageWrapper';
-import { StickyFooter } from '@/components/StickyFooter';
 import { useUser } from '@/contexts/UserContext';
 import { useTheme, characters } from '@/contexts/ThemeContext';
 import { toast } from 'sonner';
@@ -244,7 +243,7 @@ export default function Settings() {
 
       {/* Edit Profile Modal */}
       {showEditProfile && (
-        <div className="fixed inset-0 bg-foreground/50 flex items-end justify-center z-[60] animate-fade-in">
+        <div className="fixed inset-0 bg-foreground/50 flex items-end justify-center z-50 animate-fade-in">
           <div className="bg-card w-full max-w-lg rounded-t-3xl animate-slide-up max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Edit Profile</h2>
@@ -253,7 +252,7 @@ export default function Settings() {
               </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-4 pb-28">
+            <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Name</label>
                 <input
@@ -290,18 +289,23 @@ export default function Settings() {
               </div>
             </div>
             
-            <StickyFooter>
-              <Button variant="cta" onClick={handleSaveProfile} className="w-full" size="lg">
+            <div className="p-6 pt-4 border-t border-border bg-card safe-bottom">
+              <Button 
+                onClick={handleSaveProfile} 
+                className="w-full shadow-lg" 
+                size="lg"
+                style={{ boxShadow: '0 8px 24px -4px hsl(var(--primary) / 0.4)' }}
+              >
                 Save Changes
               </Button>
-            </StickyFooter>
+            </div>
           </div>
         </div>
       )}
 
       {/* Theme Settings Modal */}
       {showThemeSettings && (
-        <div className="fixed inset-0 bg-foreground/50 flex items-end justify-center z-[60] animate-fade-in">
+        <div className="fixed inset-0 bg-foreground/50 flex items-end justify-center z-50 animate-fade-in">
           <div className="bg-card w-full max-w-lg rounded-t-3xl animate-slide-up max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Choose Theme</h2>
@@ -310,7 +314,7 @@ export default function Settings() {
               </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6 pt-4 pb-28">
+            <div className="flex-1 overflow-y-auto p-6 pt-4">
               <div className="grid grid-cols-2 gap-4">
                 {characters.map((char) => (
                   <button
@@ -335,18 +339,23 @@ export default function Settings() {
               </div>
             </div>
             
-            <StickyFooter>
-              <Button variant="cta" onClick={() => setShowThemeSettings(false)} className="w-full" size="lg">
+            <div className="p-6 pt-4 border-t border-border bg-card safe-bottom">
+              <Button 
+                onClick={() => setShowThemeSettings(false)} 
+                className="w-full shadow-lg" 
+                size="lg"
+                style={{ boxShadow: '0 8px 24px -4px hsl(var(--primary) / 0.4)' }}
+              >
                 Done
               </Button>
-            </StickyFooter>
+            </div>
           </div>
         </div>
       )}
 
       {/* Auto SOS Modal */}
       {showAutoSOS && (
-        <div className="fixed inset-0 bg-foreground/50 flex items-end justify-center z-[60] animate-fade-in">
+        <div className="fixed inset-0 bg-foreground/50 flex items-end justify-center z-50 animate-fade-in">
           <div className="bg-card w-full max-w-lg rounded-t-3xl animate-slide-up max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Auto SOS Triggers</h2>
@@ -355,7 +364,7 @@ export default function Settings() {
               </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-3 pb-28">
+            <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-3">
               {[
                 { key: 'fallDetection', label: 'Fall Detection', desc: 'Detect sudden falls and trigger alert' },
                 { key: 'distressSound', label: 'Distress Sound', desc: 'Voice-activated emergency detection' },
@@ -385,26 +394,23 @@ export default function Settings() {
               ))}
             </div>
             
-            <StickyFooter>
-              <Button
-                variant="cta"
-                onClick={() => {
-                  setShowAutoSOS(false);
-                  toast.success('Settings saved');
-                }}
-                className="w-full"
+            <div className="p-6 pt-4 border-t border-border bg-card safe-bottom">
+              <Button 
+                onClick={() => { setShowAutoSOS(false); toast.success('Settings saved'); }} 
+                className="w-full shadow-lg" 
                 size="lg"
+                style={{ boxShadow: '0 8px 24px -4px hsl(var(--primary) / 0.4)' }}
               >
                 Save Settings
               </Button>
-            </StickyFooter>
+            </div>
           </div>
         </div>
       )}
 
       {/* Safety Check-ins Modal */}
       {showCheckIns && (
-        <div className="fixed inset-0 bg-foreground/50 flex items-end justify-center z-[60] animate-fade-in">
+        <div className="fixed inset-0 bg-foreground/50 flex items-end justify-center z-50 animate-fade-in">
           <div className="bg-card w-full max-w-lg rounded-t-3xl animate-slide-up max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Safety Check-ins</h2>
@@ -413,7 +419,7 @@ export default function Settings() {
               </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-4 pb-28">
+            <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-4">
               <div className="flex items-center justify-between p-4 bg-secondary rounded-xl shadow-sm">
                 <div>
                   <p className="font-medium text-foreground">Enable Check-ins</p>
@@ -519,11 +525,16 @@ export default function Settings() {
               )}
             </div>
             
-            <StickyFooter>
-              <Button variant="cta" onClick={handleSaveCheckIns} className="w-full" size="lg">
+            <div className="p-6 pt-4 border-t border-border bg-card safe-bottom">
+              <Button 
+                onClick={handleSaveCheckIns} 
+                className="w-full shadow-lg" 
+                size="lg"
+                style={{ boxShadow: '0 8px 24px -4px hsl(var(--primary) / 0.4)' }}
+              >
                 Save Settings
               </Button>
-            </StickyFooter>
+            </div>
           </div>
         </div>
       )}

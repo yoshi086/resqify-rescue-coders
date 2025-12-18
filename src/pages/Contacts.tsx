@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Plus, Phone, Trash2, Edit2, X, Shield, Star, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageWrapper } from '@/components/PageWrapper';
-import { StickyFooter } from '@/components/StickyFooter';
 import { PermissionToggle, PermissionType } from '@/components/PermissionToggle';
 import { useUser, Contact } from '@/contexts/UserContext';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 const relationships = ['Mother', 'Father', 'Spouse', 'Sibling', 'Friend', 'Other'];
 
