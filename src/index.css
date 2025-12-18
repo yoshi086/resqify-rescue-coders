@@ -48,6 +48,7 @@
     --shadow-soft: 0 4px 20px -4px hsl(220 15% 15% / 0.1);
     --shadow-card: 0 8px 30px -8px hsl(220 15% 15% / 0.12);
     --shadow-button: 0 4px 14px -2px hsl(var(--primary) / 0.35);
+    --shadow-cta: 0 16px 40px -14px hsl(var(--primary) / 0.55);
     --shadow-sos: 0 8px 40px -4px hsl(var(--sos-bg) / 0.5);
 
     /* Character theme colors (HSL format) */
