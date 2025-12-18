@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MapPin, Phone, Shield, Users, AlertTriangle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BottomNav } from '@/components/BottomNav';
+import { AuraBackground } from '@/components/AuraBackground';
 import { useUser } from '@/contexts/UserContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { toast } from 'sonner';
@@ -10,7 +11,7 @@ import { cn } from '@/lib/utils';
 
 export default function Home() {
   const navigate = useNavigate();
-  const { user, addSOSEvent, updateSOSEvent, contacts } = useUser();
+  const { user, addSOSEvent, contacts } = useUser();
   const { character } = useTheme();
   const [sosActive, setSOSActive] = useState(false);
   const [sosCountdown, setSOSCountdown] = useState<number | null>(null);
@@ -57,10 +58,9 @@ export default function Home() {
     };
     addSOSEvent(sosEvent);
 
-    // Get location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        () => {
           toast.success('SOS Alert Sent! Location shared with contacts.');
         },
         () => {
@@ -71,7 +71,6 @@ export default function Home() {
       toast.success('SOS Alert Sent!');
     }
 
-    // Notify contacts
     const bestFriends = contacts.filter(c => c.isBestFriend);
     if (bestFriends.length > 0) {
       toast.info(`Notifying ${bestFriends.length} emergency contact(s)`);
@@ -80,7 +79,6 @@ export default function Home() {
 
   const handleSOSTap = () => {
     if (sosActive) {
-      // Show PIN dialog to cancel
       const pin = prompt('Enter SOS PIN to cancel:');
       if (pin === user?.sosPin) {
         setSOSActive(false);
@@ -110,9 +108,8 @@ export default function Home() {
     if (navigator.geolocation) {
       setIsSharing(true);
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        () => {
           toast.success('Live location sharing enabled');
-          // In production: share with contacts via backend
         },
         () => {
           toast.error('Could not get location');
@@ -134,8 +131,11 @@ export default function Home() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="page-container">
+    <div className="min-h-screen bg-background relative">
+      {/* Aura background based on character */}
+      <AuraBackground />
+      
+      <div className="page-container relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -143,7 +143,7 @@ export default function Home() {
             <h1 className="text-2xl font-bold text-foreground">{user.name}</h1>
           </div>
           <div 
-            className="w-10 h-10 rounded-full flex items-center justify-center"
+            className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
             style={{ backgroundColor: character.color }}
           >
             <span className="text-lg">👋</span>
@@ -167,6 +167,11 @@ export default function Home() {
                 ? 'bg-warning'
                 : 'bg-sos shadow-sos'
             )}
+            style={{ 
+              boxShadow: sosActive 
+                ? '0 0 60px 20px hsl(var(--sos-bg) / 0.4)' 
+                : '0 12px 40px -8px hsl(var(--sos-bg) / 0.6)' 
+            }}
           >
             <span className="text-primary-foreground text-3xl font-bold">
               {sosCountdown !== null ? sosCountdown : 'SOS'}
@@ -175,7 +180,6 @@ export default function Home() {
               {sosActive ? 'Tap to Cancel' : sosCountdown !== null ? 'Starting...' : 'Hold for instant'}
             </span>
             
-            {/* Ripple effect */}
             <div className="absolute inset-0 rounded-full animate-ping bg-sos/30" style={{ animationDuration: '2s' }} />
           </button>
 
@@ -183,7 +187,7 @@ export default function Home() {
             <Button
               variant="outline"
               size="sm"
-              className="mt-4"
+              className="mt-4 shadow-md"
               onClick={cancelSOSCountdown}
             >
               Cancel
@@ -201,9 +205,10 @@ export default function Home() {
               'card-safety flex flex-col items-center gap-3 py-6 transition-all hover:shadow-lg active:scale-[0.98]',
               isSharing && 'ring-2 ring-safe'
             )}
+            style={{ boxShadow: '0 4px 20px -4px rgba(0,0,0,0.1)' }}
           >
             <div className={cn(
-              'w-12 h-12 rounded-xl flex items-center justify-center',
+              'w-12 h-12 rounded-xl flex items-center justify-center shadow-md',
               isSharing ? 'bg-safe' : 'bg-accent'
             )}>
               <MapPin className={isSharing ? 'text-safe-foreground' : 'text-primary'} size={24} />
@@ -212,17 +217,16 @@ export default function Home() {
               <p className="font-semibold text-foreground text-sm">
                 {isSharing ? 'Sharing...' : 'Share Location'}
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Real-time GPS
-              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Real-time GPS</p>
             </div>
           </button>
 
           <button
             onClick={() => setShowEmergencyCall(true)}
             className="card-safety flex flex-col items-center gap-3 py-6 transition-all hover:shadow-lg active:scale-[0.98]"
+            style={{ boxShadow: '0 4px 20px -4px rgba(0,0,0,0.1)' }}
           >
-            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shadow-md">
               <Phone className="text-primary" size={24} />
             </div>
             <div className="text-center">
@@ -234,8 +238,9 @@ export default function Home() {
           <button
             onClick={() => navigate('/map')}
             className="card-safety flex flex-col items-center gap-3 py-6 transition-all hover:shadow-lg active:scale-[0.98]"
+            style={{ boxShadow: '0 4px 20px -4px rgba(0,0,0,0.1)' }}
           >
-            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shadow-md">
               <Shield className="text-primary" size={24} />
             </div>
             <div className="text-center">
@@ -247,8 +252,9 @@ export default function Home() {
           <button
             onClick={() => navigate('/contacts')}
             className="card-safety flex flex-col items-center gap-3 py-6 transition-all hover:shadow-lg active:scale-[0.98]"
+            style={{ boxShadow: '0 4px 20px -4px rgba(0,0,0,0.1)' }}
           >
-            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shadow-md">
               <Users className="text-primary" size={24} />
             </div>
             <div className="text-center">
@@ -260,7 +266,7 @@ export default function Home() {
 
         {/* Safety Status */}
         {user.isMinor && (
-          <div className="card-safety bg-accent/50 flex items-center gap-4 mb-4">
+          <div className="card-safety bg-accent/50 flex items-center gap-4 mb-4 shadow-md">
             <AlertTriangle className="text-warning" size={24} />
             <div>
               <p className="font-semibold text-foreground text-sm">Minor Safety Active</p>
@@ -275,23 +281,23 @@ export default function Home() {
       {/* Emergency Call Modal */}
       {showEmergencyCall && (
         <div className="fixed inset-0 bg-foreground/50 flex items-end justify-center z-50 animate-fade-in">
-          <div className="bg-card w-full max-w-lg rounded-t-3xl p-6 animate-slide-up">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-card w-full max-w-lg rounded-t-3xl animate-slide-up flex flex-col">
+            <div className="flex items-center justify-between p-6 pb-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Emergency Numbers</h2>
               <button
                 onClick={() => setShowEmergencyCall(false)}
-                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
+                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shadow-sm"
               >
                 <X size={20} />
               </button>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="p-6 pt-4 grid grid-cols-2 gap-4">
               {emergencyNumbers.map((item) => (
                 <a
                   key={item.number}
                   href={`tel:${item.number}`}
-                  className="card-safety flex items-center gap-3 py-4 hover:bg-accent transition-colors"
+                  className="card-safety flex items-center gap-3 py-4 hover:bg-accent transition-colors shadow-md"
                 >
                   <span className="text-2xl">{item.icon}</span>
                   <div>
@@ -300,6 +306,17 @@ export default function Home() {
                   </div>
                 </a>
               ))}
+            </div>
+            
+            <div className="p-6 pt-0 safe-bottom">
+              <Button 
+                onClick={() => setShowEmergencyCall(false)} 
+                variant="outline"
+                className="w-full shadow-md" 
+                size="lg"
+              >
+                Close
+              </Button>
             </div>
           </div>
         </div>

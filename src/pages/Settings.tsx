@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Shield, Bell, Clock, LogOut, ChevronRight, AlertTriangle, MapPin, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -30,12 +30,25 @@ export default function Settings() {
     lowBattery: true,
   });
 
-  const [checkInSettings, setCheckInSettings] = useState({
-    enabled: true,
-    unsafeStartTime: '18:00',
-    unsafeEndTime: '05:00',
-    interval: 30,
+  // Load saved check-in settings from localStorage
+  const [checkInSettings, setCheckInSettings] = useState(() => {
+    const saved = localStorage.getItem('resqify-checkin-settings');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    return {
+      enabled: true,
+      unsafeStartTime: '18:00',
+      unsafeEndTime: '05:00',
+      interval: 30,
+      customInterval: '',
+    };
   });
+
+  // Save check-in settings to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('resqify-checkin-settings', JSON.stringify(checkInSettings));
+  }, [checkInSettings]);
 
   const handleSaveProfile = () => {
     if (!profileForm.name || !profileForm.homeAddress) {
@@ -55,6 +68,20 @@ export default function Settings() {
     updateUser(updates);
     toast.success('Profile updated');
     setShowEditProfile(false);
+  };
+
+  const handleSaveCheckIns = () => {
+    // Validate custom interval if entered
+    if (checkInSettings.customInterval) {
+      const customVal = parseInt(checkInSettings.customInterval);
+      if (isNaN(customVal) || customVal < 5 || customVal > 240) {
+        toast.error('Custom interval must be between 5-240 minutes');
+        return;
+      }
+      setCheckInSettings(prev => ({ ...prev, interval: customVal }));
+    }
+    toast.success('Check-in settings saved');
+    setShowCheckIns(false);
   };
 
   const handleLogout = () => {
@@ -77,7 +104,7 @@ export default function Settings() {
           {/* User Card */}
           <div className="card-safety flex items-center gap-4 mb-6">
             <div 
-              className="w-14 h-14 rounded-full flex items-center justify-center"
+              className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
               style={{ backgroundColor: character.color }}
             >
               <span className="text-2xl">👤</span>
@@ -116,7 +143,7 @@ export default function Settings() {
                 }}
                 className="w-full flex items-center gap-4 p-4 text-left hover:bg-accent transition-colors border-b border-border"
               >
-                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-sm">
                   <User size={20} className="text-primary" />
                 </div>
                 <div className="flex-1">
@@ -130,7 +157,7 @@ export default function Settings() {
                 onClick={() => setShowThemeSettings(true)}
                 className="w-full flex items-center gap-4 p-4 text-left hover:bg-accent transition-colors"
               >
-                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-sm">
                   <Palette size={20} className="text-primary" />
                 </div>
                 <div className="flex-1">
@@ -152,7 +179,7 @@ export default function Settings() {
                 onClick={() => setShowAutoSOS(true)}
                 className="w-full flex items-center gap-4 p-4 text-left hover:bg-accent transition-colors border-b border-border"
               >
-                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-sm">
                   <Shield size={20} className="text-primary" />
                 </div>
                 <div className="flex-1">
@@ -166,12 +193,14 @@ export default function Settings() {
                 onClick={() => setShowCheckIns(true)}
                 className="w-full flex items-center gap-4 p-4 text-left hover:bg-accent transition-colors"
               >
-                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-sm">
                   <Clock size={20} className="text-primary" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-foreground">Safety Check-ins</p>
-                  <p className="text-xs text-muted-foreground">Periodic wellness checks</p>
+                  <p className="text-xs text-muted-foreground">
+                    Every {checkInSettings.interval} minutes
+                  </p>
                 </div>
                 <ChevronRight size={20} className="text-muted-foreground" />
               </button>
@@ -188,7 +217,7 @@ export default function Settings() {
                 onClick={() => toast.info('Configure notifications in device settings')}
                 className="w-full flex items-center gap-4 p-4 text-left hover:bg-accent transition-colors"
               >
-                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-sm">
                   <Bell size={20} className="text-primary" />
                 </div>
                 <div className="flex-1">
@@ -203,7 +232,7 @@ export default function Settings() {
           {/* Logout */}
           <Button
             variant="outline"
-            className="w-full text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+            className="w-full text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground shadow-md"
             onClick={handleLogout}
           >
             <LogOut size={18} />
@@ -218,7 +247,7 @@ export default function Settings() {
           <div className="bg-card w-full max-w-lg rounded-t-3xl animate-slide-up max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Edit Profile</h2>
-              <button onClick={() => setShowEditProfile(false)} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+              <button onClick={() => setShowEditProfile(false)} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shadow-sm">
                 <X size={20} />
               </button>
             </div>
@@ -230,7 +259,7 @@ export default function Settings() {
                   type="text"
                   value={profileForm.name}
                   onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                  className="input-safety"
+                  className="input-safety shadow-sm"
                 />
               </div>
 
@@ -242,7 +271,7 @@ export default function Settings() {
                     value={profileForm.homeAddress}
                     onChange={(e) => setProfileForm({ ...profileForm, homeAddress: e.target.value })}
                     rows={3}
-                    className="input-safety pl-12 resize-none"
+                    className="input-safety pl-12 resize-none shadow-sm"
                   />
                 </div>
               </div>
@@ -254,14 +283,19 @@ export default function Settings() {
                   value={profileForm.sosPin}
                   onChange={(e) => setProfileForm({ ...profileForm, sosPin: e.target.value })}
                   placeholder="Leave blank to keep current"
-                  className="input-safety"
+                  className="input-safety shadow-sm"
                   inputMode="numeric"
                 />
               </div>
             </div>
             
             <div className="p-6 pt-4 border-t border-border bg-card safe-bottom">
-              <Button onClick={handleSaveProfile} className="w-full" size="lg">
+              <Button 
+                onClick={handleSaveProfile} 
+                className="w-full shadow-lg" 
+                size="lg"
+                style={{ boxShadow: '0 8px 24px -4px hsl(var(--primary) / 0.4)' }}
+              >
                 Save Changes
               </Button>
             </div>
@@ -275,7 +309,7 @@ export default function Settings() {
           <div className="bg-card w-full max-w-lg rounded-t-3xl animate-slide-up max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Choose Theme</h2>
-              <button onClick={() => setShowThemeSettings(false)} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+              <button onClick={() => setShowThemeSettings(false)} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shadow-sm">
                 <X size={20} />
               </button>
             </div>
@@ -291,11 +325,14 @@ export default function Settings() {
                       toast.success(`Theme changed to ${char.name}`);
                     }}
                     className={cn(
-                      'p-4 rounded-2xl border-2 transition-all active:scale-95',
+                      'p-4 rounded-2xl border-2 transition-all active:scale-95 shadow-md',
                       theme === char.id ? 'border-primary bg-accent' : 'border-border bg-card'
                     )}
                   >
-                    <div className="w-12 h-12 rounded-full mx-auto mb-2" style={{ backgroundColor: char.color }} />
+                    <div 
+                      className="w-12 h-12 rounded-full mx-auto mb-2 shadow-lg" 
+                      style={{ backgroundColor: char.color }} 
+                    />
                     <p className="font-medium text-foreground text-center text-sm">{char.name}</p>
                   </button>
                 ))}
@@ -303,7 +340,12 @@ export default function Settings() {
             </div>
             
             <div className="p-6 pt-4 border-t border-border bg-card safe-bottom">
-              <Button onClick={() => setShowThemeSettings(false)} className="w-full" size="lg">
+              <Button 
+                onClick={() => setShowThemeSettings(false)} 
+                className="w-full shadow-lg" 
+                size="lg"
+                style={{ boxShadow: '0 8px 24px -4px hsl(var(--primary) / 0.4)' }}
+              >
                 Done
               </Button>
             </div>
@@ -317,7 +359,7 @@ export default function Settings() {
           <div className="bg-card w-full max-w-lg rounded-t-3xl animate-slide-up max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Auto SOS Triggers</h2>
-              <button onClick={() => setShowAutoSOS(false)} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+              <button onClick={() => setShowAutoSOS(false)} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shadow-sm">
                 <X size={20} />
               </button>
             </div>
@@ -328,7 +370,7 @@ export default function Settings() {
                 { key: 'distressSound', label: 'Distress Sound', desc: 'Voice-activated emergency detection' },
                 { key: 'lowBattery', label: 'Low Battery Alert', desc: 'Alert contacts when battery reaches 5%' },
               ].map((item) => (
-                <div key={item.key} className="flex items-center justify-between p-4 bg-secondary rounded-xl">
+                <div key={item.key} className="flex items-center justify-between p-4 bg-secondary rounded-xl shadow-sm">
                   <div>
                     <p className="font-medium text-foreground">{item.label}</p>
                     <p className="text-xs text-muted-foreground">{item.desc}</p>
@@ -339,12 +381,12 @@ export default function Settings() {
                       [item.key]: !prev[item.key as keyof typeof prev]
                     }))}
                     className={cn(
-                      'w-12 h-7 rounded-full transition-colors relative',
+                      'w-12 h-7 rounded-full transition-colors relative shadow-inner',
                       autoSOSSettings[item.key as keyof typeof autoSOSSettings] ? 'bg-primary' : 'bg-muted'
                     )}
                   >
                     <div className={cn(
-                      'absolute top-1 w-5 h-5 rounded-full bg-card shadow transition-transform',
+                      'absolute top-1 w-5 h-5 rounded-full bg-card shadow-md transition-transform',
                       autoSOSSettings[item.key as keyof typeof autoSOSSettings] ? 'translate-x-6' : 'translate-x-1'
                     )} />
                   </button>
@@ -353,7 +395,12 @@ export default function Settings() {
             </div>
             
             <div className="p-6 pt-4 border-t border-border bg-card safe-bottom">
-              <Button onClick={() => { setShowAutoSOS(false); toast.success('Settings saved'); }} className="w-full" size="lg">
+              <Button 
+                onClick={() => { setShowAutoSOS(false); toast.success('Settings saved'); }} 
+                className="w-full shadow-lg" 
+                size="lg"
+                style={{ boxShadow: '0 8px 24px -4px hsl(var(--primary) / 0.4)' }}
+              >
                 Save Settings
               </Button>
             </div>
@@ -367,13 +414,13 @@ export default function Settings() {
           <div className="bg-card w-full max-w-lg rounded-t-3xl animate-slide-up max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-border">
               <h2 className="text-xl font-bold text-foreground">Safety Check-ins</h2>
-              <button onClick={() => setShowCheckIns(false)} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+              <button onClick={() => setShowCheckIns(false)} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shadow-sm">
                 <X size={20} />
               </button>
             </div>
             
             <div className="flex-1 overflow-y-auto p-6 pt-4 space-y-4">
-              <div className="flex items-center justify-between p-4 bg-secondary rounded-xl">
+              <div className="flex items-center justify-between p-4 bg-secondary rounded-xl shadow-sm">
                 <div>
                   <p className="font-medium text-foreground">Enable Check-ins</p>
                   <p className="text-xs text-muted-foreground">Only when outside home during unsafe hours</p>
@@ -381,12 +428,12 @@ export default function Settings() {
                 <button
                   onClick={() => setCheckInSettings(prev => ({ ...prev, enabled: !prev.enabled }))}
                   className={cn(
-                    'w-12 h-7 rounded-full transition-colors relative',
+                    'w-12 h-7 rounded-full transition-colors relative shadow-inner',
                     checkInSettings.enabled ? 'bg-primary' : 'bg-muted'
                   )}
                 >
                   <div className={cn(
-                    'absolute top-1 w-5 h-5 rounded-full bg-card shadow transition-transform',
+                    'absolute top-1 w-5 h-5 rounded-full bg-card shadow-md transition-transform',
                     checkInSettings.enabled ? 'translate-x-6' : 'translate-x-1'
                   )} />
                 </button>
@@ -403,7 +450,7 @@ export default function Settings() {
                           type="time"
                           value={checkInSettings.unsafeStartTime}
                           onChange={(e) => setCheckInSettings(prev => ({ ...prev, unsafeStartTime: e.target.value }))}
-                          className="input-safety py-2"
+                          className="input-safety py-2 shadow-sm"
                         />
                       </div>
                       <div className="flex-1">
@@ -412,29 +459,66 @@ export default function Settings() {
                           type="time"
                           value={checkInSettings.unsafeEndTime}
                           onChange={(e) => setCheckInSettings(prev => ({ ...prev, unsafeEndTime: e.target.value }))}
-                          className="input-safety py-2"
+                          className="input-safety py-2 shadow-sm"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <label className="text-sm font-medium text-foreground">Check-in Interval</label>
+                    
+                    {/* Preset buttons */}
                     <div className="flex gap-2">
                       {[15, 30, 45, 60].map((min) => (
                         <button
                           key={min}
-                          onClick={() => setCheckInSettings(prev => ({ ...prev, interval: min }))}
+                          onClick={() => setCheckInSettings(prev => ({ 
+                            ...prev, 
+                            interval: min,
+                            customInterval: '' 
+                          }))}
                           className={cn(
-                            'flex-1 py-3 rounded-xl text-sm font-medium transition-colors',
-                            checkInSettings.interval === min
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-secondary text-muted-foreground'
+                            'flex-1 py-3 rounded-xl text-sm font-medium transition-all shadow-sm',
+                            checkInSettings.interval === min && !checkInSettings.customInterval
+                              ? 'bg-primary text-primary-foreground shadow-md'
+                              : 'bg-secondary text-muted-foreground hover:bg-accent'
                           )}
                         >
                           {min}m
                         </button>
                       ))}
+                    </div>
+
+                    {/* Custom interval input */}
+                    <div className="space-y-2 pt-2">
+                      <label className="text-xs text-muted-foreground">Or set custom interval (5-240 minutes)</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          min="5"
+                          max="240"
+                          placeholder="Enter minutes"
+                          value={checkInSettings.customInterval}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setCheckInSettings(prev => ({ 
+                              ...prev, 
+                              customInterval: val,
+                              interval: val ? parseInt(val) || prev.interval : prev.interval
+                            }));
+                          }}
+                          className="input-safety flex-1 shadow-sm"
+                        />
+                        <span className="flex items-center text-muted-foreground px-2">min</span>
+                      </div>
+                    </div>
+
+                    {/* Current setting display */}
+                    <div className="p-3 bg-accent rounded-xl">
+                      <p className="text-sm text-center">
+                        Check-ins every <span className="font-bold text-primary">{checkInSettings.interval}</span> minutes
+                      </p>
                     </div>
                   </div>
                 </>
@@ -442,7 +526,12 @@ export default function Settings() {
             </div>
             
             <div className="p-6 pt-4 border-t border-border bg-card safe-bottom">
-              <Button onClick={() => { setShowCheckIns(false); toast.success('Settings saved'); }} className="w-full" size="lg">
+              <Button 
+                onClick={handleSaveCheckIns} 
+                className="w-full shadow-lg" 
+                size="lg"
+                style={{ boxShadow: '0 8px 24px -4px hsl(var(--primary) / 0.4)' }}
+              >
                 Save Settings
               </Button>
             </div>
